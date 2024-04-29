@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stored XSS Example</title>
+</head>
+
+<body>
+
+    <h1>Collected data</h1>
+
+    <form action="/store" method="post">
+        <label for="comment">Enter value:<br></label>
+        <textarea id="comment" name="comment"></textarea>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="comments"></div>
+
+    <script>
+        // Fetch and display comments
+        async function fetchComments() {
+            const response = await fetch('/comments');
+            const comment = await response.text();
+            document.getElementById('comments').innerHTML = comment;
+
+            // Execute scripts directly in the fetched content
+            const scripts = document.getElementById('comments').getElementsByTagName('script');
+            for (let i = 0; i < scripts.length; i++) {
+                eval(scripts[i].innerText);
+            }
+        }
+
+        // Fetch comments on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchComments();
+        });
+    </script>
+
+</body>
+
+</html>
